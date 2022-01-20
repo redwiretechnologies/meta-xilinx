@@ -25,7 +25,6 @@ SRC_URI_append = " \
      file://0022-fixing-the-.bss-relocation-issue.patch \
      file://0023-Fixed-the-bug-in-the-R_MICROBLAZE_64_NONE-relocation.patch \
      file://0024-Revert-ld-Remove-unused-expression-state.patch \
-     file://0025-Patch-Microblaze-Binutils-security-check-is-causing-.patch \
      file://0026-fixing-the-long-long-long-mingw-toolchain-issue.patch \
      file://0027-Added-support-to-new-arithmetic-single-register-inst.patch \
      file://0028-Patch-MicroBlaze-double-imml-generation-for-64-bit-v.patch \
@@ -34,11 +33,7 @@ SRC_URI_append = " \
      file://0031-ldlang.c-Workaround-for-improper-address-mapping-cau.patch \
      file://0032-gas-revert-moving-of-md_pseudo_table-from-const.patch \
      file://0033-Fix-various-compile-warnings.patch \
-     file://0034-Add-initial-port-of-linux-gdbserver.patch \
-     file://0035-Initial-port-of-core-reading-support.patch \
      file://0036-Fix-debug-message-when-register-is-unavailable.patch \
      file://0037-microblaze-Add-build_gdbserver-yes-to-top-level-conf.patch \
      file://0038-Initial-support-for-native-gdb.patch \
-     file://0039-Fixing-the-issues-related-to-GDB-7.12.patch \
-     file://0040-Patch-microblaze-Adding-64-bit-MB-support.patch \
      "
