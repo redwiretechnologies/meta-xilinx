@@ -5,7 +5,9 @@ inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "none"
-COMPATIBLE_MACHINE_versal = ".*"
+COMPATIBLE_MACHINE:versal = ".*"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 S = "${WORKDIR}/git"
 B = "${S}/lib/sw_apps/versal_plm/src"
@@ -63,7 +65,7 @@ do_install() {
 PACKAGES = ""
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
-PLM_IMAGE_NAME ??= "plm-versal-mb"
+PLM_IMAGE_NAME ??= "plm-${MACHINE}"
 
 inherit image-artifact-names
 

@@ -1,7 +1,7 @@
-From cea8d524fca305c2878374433d9745b938e4c78f Mon Sep 17 00:00:00 2001
+From c5c42765e7436fa20cc2069fa0426995cf940e5a Mon Sep 17 00:00:00 2001
 From: Nagaraju Mekala <nmekala@xilix.com>
 Date: Mon, 18 Jul 2016 12:24:28 +0530
-Subject: [PATCH 09/52] Add new bit-field instructions
+Subject: [PATCH 09/38] Add new bit-field instructions
 
 This patches adds new bsefi and bsifi instructions.
 BSEFI- The instruction shall extract a bit field from a
@@ -22,20 +22,20 @@ Conflicts:
  opcodes/microblaze-opcm.h  |  6 +++-
  4 files changed, 104 insertions(+), 5 deletions(-)
 
-diff --git a/gas/config/tc-microblaze.c b/gas/config/tc-microblaze.c
-index 74a63abeb0..765abfb388 100644
---- a/gas/config/tc-microblaze.c
-+++ b/gas/config/tc-microblaze.c
+Index: git/gas/config/tc-microblaze.c
+===================================================================
+--- git.orig/gas/config/tc-microblaze.c
++++ git/gas/config/tc-microblaze.c
 @@ -917,7 +917,7 @@ md_assemble (char * str)
    unsigned reg2;
    unsigned reg3;
    unsigned isize;
--  unsigned int immed, temp;
-+  unsigned int immed, immed2, temp;
+-  unsigned int immed = 0, temp;
++  unsigned int immed = 0, immed2 = 0, temp;
    expressionS exp;
    char name[20];
  
-@@ -1172,7 +1172,76 @@ md_assemble (char * str)
+@@ -1178,7 +1178,76 @@ md_assemble (char * str)
        inst |= (reg2 << RA_LOW) & RA_MASK;
        inst |= (immed << IMM_LOW) & IMM5_MASK;
        break;
@@ -60,7 +60,7 @@ index 74a63abeb0..765abfb388 100644
 +        as_fatal (_("Cannot use special register with this instruction"));
 +      if (check_spl_reg (&reg2))
 +        as_fatal (_("Cannot use special register with this instruction"));
- 
++
 +      /* Width immediate value.  */
 +      if (strcmp (op_end, ""))
 +        op_end = parse_imm (op_end + 1, &exp, MIN_IMM_WIDTH, MAX_IMM_WIDTH);
@@ -75,7 +75,7 @@ index 74a63abeb0..765abfb388 100644
 +        immed = exp.X_add_number;
 +      if (opcode->instr == bsefi && immed > 31)
 +        as_fatal (_("Width value must be less than 32"));
-+
+ 
 +      /* Shift immediate value.  */
 +      if (strcmp (op_end, ""))
 +        op_end = parse_imm (op_end + 1, &exp, MIN_IMM, MAX_IMM);
@@ -112,11 +112,11 @@ index 74a63abeb0..765abfb388 100644
      case INST_TYPE_R1_R2:
        if (strcmp (op_end, ""))
          op_end = parse_reg (op_end + 1, &reg1);  /* Get r1.  */
-diff --git a/opcodes/microblaze-dis.c b/opcodes/microblaze-dis.c
-index be1534c257..315c6e9350 100644
---- a/opcodes/microblaze-dis.c
-+++ b/opcodes/microblaze-dis.c
-@@ -91,7 +91,19 @@ get_field_imm5_mbar (struct string_buf *buf, long instr)
+Index: git/opcodes/microblaze-dis.c
+===================================================================
+--- git.orig/opcodes/microblaze-dis.c
++++ git/opcodes/microblaze-dis.c
+@@ -91,7 +91,19 @@ get_field_imm5_mbar (struct string_buf *
  }
  
  static char *
@@ -137,7 +137,7 @@ index be1534c257..315c6e9350 100644
  {
    char *p = strbuf (buf);
  
-@@ -427,7 +439,11 @@ print_insn_microblaze (bfd_vma memaddr, struct disassemble_info * info)
+@@ -427,7 +439,11 @@ print_insn_microblaze (bfd_vma memaddr,
  	  /* For mbar 16 or sleep insn.  */
  	case INST_TYPE_NONE:
  	  break;
@@ -150,10 +150,10 @@ index be1534c257..315c6e9350 100644
  	case INST_TYPE_RD:
  	  print_func (stream, "\t%s", get_field_rd (&buf, inst));
  	  break;
-diff --git a/opcodes/microblaze-opc.h b/opcodes/microblaze-opc.h
-index c7a506b845..f61f4ef66d 100644
---- a/opcodes/microblaze-opc.h
-+++ b/opcodes/microblaze-opc.h
+Index: git/opcodes/microblaze-opc.h
+===================================================================
+--- git.orig/opcodes/microblaze-opc.h
++++ git/opcodes/microblaze-opc.h
 @@ -59,6 +59,9 @@
  /* For mbar.  */
  #define INST_TYPE_IMM5 20
@@ -181,9 +181,9 @@ index c7a506b845..f61f4ef66d 100644
 -#define MAX_OPCODES 299
 +#define MAX_OPCODES 301
  
- struct op_code_struct
+ const struct op_code_struct
  {
-@@ -159,6 +164,8 @@ struct op_code_struct
+@@ -159,6 +164,8 @@ const struct op_code_struct
    {"bslli", INST_TYPE_RD_R1_IMM5, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64000400, OPCODE_MASK_H3, bslli, barrel_shift_inst },
    {"bsrai", INST_TYPE_RD_R1_IMM5, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64000200, OPCODE_MASK_H3, bsrai, barrel_shift_inst },
    {"bsrli", INST_TYPE_RD_R1_IMM5, INST_NO_OFFSET, NO_DELAY_SLOT, IMMVAL_MASK_NON_SPECIAL, 0x64000000, OPCODE_MASK_H3, bsrli, barrel_shift_inst },
@@ -201,10 +201,10 @@ index c7a506b845..f61f4ef66d 100644
 +
  #endif /* MICROBLAZE_OPC */
  
-diff --git a/opcodes/microblaze-opcm.h b/opcodes/microblaze-opcm.h
-index b05e319862..fa921c90c9 100644
---- a/opcodes/microblaze-opcm.h
-+++ b/opcodes/microblaze-opcm.h
+Index: git/opcodes/microblaze-opcm.h
+===================================================================
+--- git.orig/opcodes/microblaze-opcm.h
++++ git/opcodes/microblaze-opcm.h
 @@ -29,7 +29,7 @@ enum microblaze_instr
    addi, rsubi, addic, rsubic, addik, rsubik, addikc, rsubikc, mul,
    mulh, mulhu, mulhsu,swapb,swaph,
@@ -232,6 +232,3 @@ index b05e319862..fa921c90c9 100644
  /* FSL imm mask for get, put instructions.  */
  #define  RFSL_MASK 0x000000F
  
--- 
-2.17.1
-

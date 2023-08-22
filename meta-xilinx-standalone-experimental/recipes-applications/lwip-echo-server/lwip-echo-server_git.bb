@@ -2,17 +2,22 @@ inherit esw deploy python3native
 
 ESW_COMPONENT_SRC = "/lib/sw_apps/lwip_echo_server/src/"
 
-DEPENDS += "dtc-native python3-dtc-native libxil lwip xiltimer device-tree python3-pyyaml-native"
+DEPENDS += "libxil lwip xiltimer"
 
-do_configure_prepend() {
+do_configure:prepend() {
+    (
     cd ${S}
-    nativepython3 ${S}/scripts/linker_gen.py -d ${DTBFILE} -o ${OECMAKE_SOURCEPATH}
+    lopper ${DTS_FILE} -- baremetallinker_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    install -m 0755 memory.ld ${S}/${ESW_COMPONENT_SRC}/
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
+    )
 }
 
 do_generate_app_data() {
     # This script should also not rely on relative paths and such
     cd ${S}
-    nativepython3 ${S}/scripts/lib_parser.py -d ${DTBFILE} -o ${OECMAKE_SOURCEPATH}
+    lopper ${DTS_FILE} -- bmcmake_metadata_xlnx.py ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC} hwcmake_metadata ${S}
+    install -m 0755 *.cmake ${S}/${ESW_COMPONENT_SRC}/
 }
 addtask do_generate_app_data before do_configure after do_prepare_recipe_sysroot
 do_prepare_recipe_sysroot[rdeptask] = "do_unpack"
@@ -23,8 +28,9 @@ do_install() {
     install -m 0755  ${B}/lwip_echo* ${D}/${base_libdir}/firmware
 }
 
-LWIP_ECHO_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}-${DATETIME}"
-LWIP_ECHO_BASE_NAME[vardepsexclude] = "DATETIME"
+inherit image-artifact-names
+
+LWIP_ECHO_BASE_NAME ?= "${BPN}-${PKGE}-${PKGV}-${PKGR}-${MACHINE}${IMAGE_VERSION_SUFFIX}"
 
 do_deploy() {
 
@@ -38,4 +44,4 @@ do_deploy() {
 
 addtask deploy before do_build after do_package
 
-FILES_${PN} = "${base_libdir}/firmware/lwip_echo*"
+FILES:${PN} = "${base_libdir}/firmware/lwip_echo*"

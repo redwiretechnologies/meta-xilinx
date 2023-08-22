@@ -4,14 +4,18 @@ inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = ".*-(elf|eabi)"
 COMPATIBLE_MACHINE = "none"
-COMPATIBLE_MACHINE_zynq = ".*"
-COMPATIBLE_MACHINE_zynqmp = ".*"
+COMPATIBLE_MACHINE:zynq = ".*"
+COMPATIBLE_MACHINE:zynqmp = ".*"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 S = "${WORKDIR}/git"
 
-B = "${S}/lib/sw_apps/undefined/src"
-B_zynq = "${S}/lib/sw_apps/zynq_fsbl/src"
-B_zynqmp = "${S}/lib/sw_apps/zynqmp_fsbl/src"
+APP_DIR = "undefined"
+APP_DIR:zynq = "zynq_fsbl"
+APP_DIR:zynqmp = "zynqmp_fsbl"
+
+B = "${S}/lib/sw_apps/${APP_DIR}/src"
 
 # The makefile does not handle parallelization
 PARALLEL_MAKE = "-j1"
@@ -26,8 +30,8 @@ EXTRA_COMPILER_FLAGS = "-g -Wall -Wextra -Os -flto -ffat-lto-objects"
 ARCHIVER = "${AR}"
 
 BSP_DIR ?= "${B}/../misc/undefined"
-BSP_DIR_zynq   ?= "${B}/../misc/zynq_fsbl_bsp"
-BSP_DIR_zynqmp ?= "${B}/../misc/zynqmp_fsbl_bsp"
+BSP_DIR:zynq   ?= "${B}/../misc/zynq_fsbl_bsp"
+BSP_DIR:zynqmp ?= "${B}/../misc/zynqmp_fsbl_bsp"
 BSP_TARGETS_DIR ?= "${BSP_DIR}/psu_cortexa53_0/libsrc"
 
 # FSBL components expect AS to be CC.
@@ -41,7 +45,7 @@ def bsp_make_vars(d):
 
 EXTRA_OEMAKE = "${@bsp_make_vars(d)}"
 
-ARM_INSTRUCTION_SET_eabi_arm = "arm"
+ARM_INSTRUCTION_SET:eabi:arm = "arm"
 do_compile() {
     oe_runmake
 }
@@ -53,7 +57,7 @@ do_install() {
 PACKAGES = ""
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
-FSBL_IMAGE_NAME ??= "fsbl"
+FSBL_IMAGE_NAME ??= "fsbl-${MACHINE}"
 
 inherit image-artifact-names
 

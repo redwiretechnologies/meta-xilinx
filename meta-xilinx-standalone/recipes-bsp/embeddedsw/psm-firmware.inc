@@ -5,7 +5,9 @@ inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "none"
-COMPATIBLE_MACHINE_versal = ".*"
+COMPATIBLE_MACHINE:versal = ".*"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 S = "${WORKDIR}/git"
 B = "${S}/lib/sw_apps/versal_psmfw/src"
@@ -63,7 +65,7 @@ do_install() {
 PACKAGES = ""
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
-PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-versal-mb"
+PSM_FIRMWARE_IMAGE_NAME ??= "psm-firmware-${MACHINE}"
 
 inherit image-artifact-names
 

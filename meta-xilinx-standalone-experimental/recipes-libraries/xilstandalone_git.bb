@@ -3,10 +3,14 @@ inherit esw python3native
 ESW_COMPONENT_SRC = "/lib/bsp/standalone/src/"
 ESW_COMPONENT_NAME = "libxilstandalone.a"
 
-DEPENDS += "dtc-native python3-dtc-native python3-pyyaml-native libgloss device-tree"
+DEPENDS += "libgloss"
 
-do_configure_prepend() {
+do_configure:prepend() {
     # This script should also not rely on relative paths and such
+    (
     cd ${S}
-    nativepython3 ${S}/scripts/generate_libdata.py -d ${DTBFILE}
+    lopper ${DTS_FILE} -- baremetal_bspconfig_xlnx ${ESW_MACHINE} ${S}/${ESW_COMPONENT_SRC}
+    install -m 0755 MemConfig.cmake ${S}/${ESW_COMPONENT_SRC}/
+    install -m 0755 *.c ${S}/${ESW_COMPONENT_SRC}/common/
+    )
 }

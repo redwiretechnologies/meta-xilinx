@@ -4,7 +4,9 @@ inherit xlnx-embeddedsw deploy
 
 COMPATIBLE_HOST = "microblaze.*-elf"
 COMPATIBLE_MACHINE = "none"
-COMPATIBLE_MACHINE_zynqmp = ".*"
+COMPATIBLE_MACHINE:zynqmp = ".*"
+
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 S = "${WORKDIR}/git"
 B = "${S}/lib/sw_apps/zynqmp_pmufw/src"
@@ -62,7 +64,7 @@ do_install() {
 PACKAGES = ""
 
 # This is the default in most BSPs.  A MACHINE.conf can override this!
-PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-zynqmp-pmu"
+PMU_FIRMWARE_IMAGE_NAME ??= "pmu-firmware-${MACHINE}"
 
 inherit image-artifact-names
 
